@@ -1,2 +1,268 @@
--- SECURED BY SEMWOK HUB (CLONE RUN EDITION)
-local _=(function(string,loadstring,game)local SG=Instance.new("\83\99\114\101\101\110\71\117\105",game.CoreGui)SG.Name="\53\101\109\87\111\107\95\84\119\111\70\114\97\109\101\115\95\72\117\98"SG.ResetOnSpawn=false if game.CoreGui:FindFirstChild("\53\101\109\87\111\107\95\84\119\111\70\114\97\109\101\115\95\72\117\98")then game.CoreGui["\53\101\109\87\111\107\95\84\119\111\70\114\97\109\101\115\95\72\117\98"]:Destroy()end local function CreateMainBox(name,pos,size,titleTxt)local f=Instance.new("\70\114\97\109\101",SG)f.Name,f.BackgroundColor3,f.Position,f.Size=name,Color3.fromRGB(15,15,15),pos,size f.Active,f.Draggable,f.ClipsDescendants=true,true,true Instance.new("\85\73\67\111\114\110\101\114",f).CornerRadius=UDim.new(0,8)local tl=Instance.new("\84\101\120\116\76\97\98\101\108",f)tl.Size,tl.Text,tl.TextColor3,tl.BackgroundTransparency,tl.Font,tl.TextSize=UDim2.new(1,0,0,35),titleTxt,Color3.new(1,1,1),1,"\83\111\114\115\101\83\97\110\115\66\111\108\100",20 tl.Position=UDim2.new(0,0,0,0)tl.TextXAlignment=Enum.TextXAlignment.Center return f end local function CreateTriangleToggle(parent)local tBtn=Instance.new("\73\109\97\103\101\66\117\116\116\111\110",parent)tBtn.Size,tBtn.Position,tBtn.BackgroundTransparency=UDim2.new(0,20,0,20),UDim2.new(1,-30,0,8),1 tBtn.Image,tBtn.ImageColor3="\114\98\120\97\115\115\101\116\105\100\58\47\47\54\48\51\49\48\57\55\50\50\53",Color3.fromRGB(15,15,15)local stroke=Instance.new("\85\73\83\116\114\111\107\101",tBtn)stroke.Color,stroke.Thickness=Color3.fromRGB(40,40,40),1 return tBtn end local function btnTP(parent,txt,y,posCFrame)local b=Instance.new("\84\101\120\116\66\117\116\116\111\110",parent)b.Size,b.Position=UDim2.new(0.92,0,0,35),UDim2.new(0.04,0,0,y)b.BackgroundColor3=Color3.fromRGB(30,30,30)b.Text,b.TextColor3,b.Font,b.TextSize=txt,Color3.new(1,1,1),"\83\111\114\115\101\83\97\110\115\66\111\108\100",14 Instance.new("\85\73\67\111\114\110\101\114",b).CornerRadius=UDim.new(0,6)b.MouseButton1Click:Connect(function()local char=game:GetService("\80\108\97\121\101\114\115").LocalPlayer.Character if char and char:FindFirstChild("\72\117\109\97\110\111\105\100\82\111\111\116\80\97\114\116")then char.HumanoidRootPart.CFrame=posCFrame end end)return b end local ZoneFrame=CreateMainBox("\90\111\110\101\70\114\117\109\101",UDim2.new(0.05,0,0.3,0),UDim2.new(0,200,0,365),"\67\76\79\78\69\32\82\85\78\32\70\79\82\32\66\82\65\73\78\82\79\84")local ZoneTriangle=CreateTriangleToggle(ZoneFrame)local zoneButtons={btnTP(ZoneFrame,"\90\79\78\69\32\49",45,CFrame.new(135.748795,3.49802542,0.501021981)),btnTP(ZoneFrame,"\90\79\78\69\32\50",85,CFrame.new(1232.22766,3.49802446,4.46258783)),btnTP(ZoneFrame,"\90\79\78\69\32\51",125,CFrame.new(2540.60742,3.49802542,-4.54981041)),btnTP(ZoneFrame,"\90\79\78\69\32\52",165,CFrame.new(3523.06494,3.49802494,-3.34155941)),btnTP(ZoneFrame,"\90\79\78\69\32\53",205,CFrame.new(4505.09375,3.49802494,8.59873104)),btnTP(ZoneFrame,"\90\79\78\69\32\54",245,CFrame.new(5492.44482,3.49802446,9.93157196)),btnTP(ZoneFrame,"\90\79\78\69\32\55",285,CFrame.new(6476.26709,3.49802399,-4.04784584))}local Footer1=Instance.new("\84\101\120\116\76\97\98\101\108",ZoneFrame)Footer1.Size,Footer1.Position=UDim2.new(1,0,0,30),UDim2.new(0,0,1,-30)Footer1.Text="\89\111\117\84\117\98\101\32\58\32\83\101\109\87\111\107"Footer1.TextColor3,Footer1.BackgroundTransparency,Footer1.Font,Footer1.TextSize=Color3.new(1,1,1),1,"\83\111\114\115\101\83\97\110\115\66\111\108\100",20 local zoneOpen=true ZoneTriangle.MouseButton1Click:Connect(function()zoneOpen=not zoneOpen if zoneOpen then ZoneFrame:TweenSize(UDim2.new(0,200,0,365),"\79\117\116","\81\117\97\100",0.2,true)ZoneTriangle.Rotation=0 task.wait(0.1)for _,btn in pairs(zoneButtons)do btn.Visible=true end Footer1.Visible=true else for _,btn in pairs(zoneButtons)do btn.Visible=false end Footer1.Visible=false ZoneFrame:TweenSize(UDim2.new(0,200,0,35),"\79\117\116","\81\117\97\100",0.2,true)ZoneTriangle.Rotation=-90 end end)end)(string,loadstring,game)
+-- ==========================================
+-- SEMWOK HUB: FULL UNINTERRUPTED TOGGLES
+-- ==========================================
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Remove old GUI to prevent stacking on re-execute
+if game.CoreGui:FindFirstChild("SemWok_TwoFrames_Hub") then
+    game.CoreGui.SemWok_TwoFrames_Hub:Destroy()
+end
+
+local SG = Instance.new("ScreenGui", game.CoreGui)
+SG.Name = "SemWok_TwoFrames_Hub"
+SG.ResetOnSpawn = false
+
+local Footer1 -- Global variable for footer visibility control
+
+-- ==========================================
+-- NOCLIP SYSTEM LOGIC
+-- ==========================================
+_G.NoclipActive = false
+local NoclipConnection = nil
+
+local function noclipAction()
+    if LP.Character then
+        for _, v in pairs(LP.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+    end
+end
+
+local function ToggleNoclip(state)
+    _G.NoclipActive = state
+    if _G.NoclipActive then
+        NoclipConnection = RunService.Stepped:Connect(noclipAction)
+    else
+        if NoclipConnection then
+            NoclipConnection:Disconnect()
+            NoclipConnection = nil
+        end
+        pcall(function()
+            if LP.Character then
+                for _, v in pairs(LP.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true
+                    end
+                end
+            end
+        end)
+    end
+end
+
+LP.CharacterAdded:Connect(function(char)
+    if _G.NoclipActive then
+        if NoclipConnection then NoclipConnection:Disconnect() end
+        NoclipConnection = RunService.Stepped:Connect(noclipAction)
+    end
+end)
+
+-- ==========================================
+-- UNINTERRUPTED SPEED LOGIC (PERPETUAL LOOP)
+-- ==========================================
+_G.SpeedActive = false
+local SpeedConnection = nil
+
+local function ToggleSpeed(state)
+    _G.SpeedActive = state
+    
+    if _G.SpeedActive then
+        -- Menggunakan Heartbeat biar dikunci tiap frame, anti-reset pas ambil item/mati
+        if SpeedConnection then SpeedConnection:Disconnect() end
+        SpeedConnection = RunService.Heartbeat:Connect(function()
+            pcall(function()
+                local char = LP.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    char.Humanoid.WalkSpeed = 100
+                end
+            end)
+        end)
+    else
+        if SpeedConnection then
+            SpeedConnection:Disconnect()
+            SpeedConnection = nil
+        end
+        -- Kembalikan ke speed normal bawaan game pas dimatikan
+        pcall(function()
+            local char = LP.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = 16
+            end
+        end)
+    end
+end
+
+-- Memastikan speed langsung jalan lagi tanpa jeda pas respawn
+LP.CharacterAdded:Connect(function()
+    if _G.SpeedActive then
+        ToggleSpeed(true)
+    end
+end)
+
+-- ==========================================
+-- GUI CREATOR BASE FUNCTIONS
+-- ==========================================
+local function CreateMainBox(name, pos, size, titleTxt, titleSize)
+    local f = Instance.new("Frame", SG)
+    f.Name, f.BackgroundColor3, f.Position, f.Size = name, Color3.fromRGB(15, 15, 15), pos, size
+    f.Active, f.Draggable = true, true
+    f.ClipsDescendants = true
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
+    
+    if titleTxt ~= "" then
+        local tl = Instance.new("TextLabel", f)
+        tl.Size, tl.Text, tl.TextColor3, tl.BackgroundTransparency, tl.Font, tl.TextSize = UDim2.new(1, 0, 0, 35), titleTxt, Color3.new(1,1,1), 1, "SourceSansBold", titleSize
+        tl.Position = UDim2.new(0, 0, 0, 0)
+        tl.TextXAlignment = Enum.TextXAlignment.Center
+    end
+    return f
+end
+
+local function CreateTriangleToggle(parent)
+    local tBtn = Instance.new("ImageButton", parent)
+    tBtn.Size = UDim2.new(0, 20, 0, 20)
+    tBtn.Position = UDim2.new(1, -30, 0, 8)
+    tBtn.BackgroundTransparency = 1
+    tBtn.Image = "rbxassetid://6031097225" 
+    tBtn.ImageColor3 = Color3.fromRGB(15, 15, 15)
+    
+    local stroke = Instance.new("UIStroke", tBtn)
+    stroke.Color = Color3.fromRGB(40, 40, 40)
+    stroke.Thickness = 1
+    return tBtn
+end
+
+local function btnTP(parent, txt, y, posCFrame)
+    local b = Instance.new("TextButton", parent)
+    b.Size, b.Position = UDim2.new(0.92, 0, 0, 35), UDim2.new(0.04, 0, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    b.Text, b.TextColor3, b.Font, b.TextSize = txt, Color3.new(1,1,1), "SourceSansBold", 14
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+    
+    b.MouseButton1Click:Connect(function()
+        local char = LP.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = posCFrame
+        end
+    end)
+    return b
+end
+
+-- ==========================================
+-- FRAME 1: CLONE RUN FOR BRAINROT
+-- ==========================================
+local ZoneFrame = CreateMainBox("ZoneFrame", UDim2.new(0.05, 0, 0.3, 0), UDim2.new(0, 200, 0, 365), "CLONE RUN FOR BRAINROT", 20)
+local ZoneTriangle = CreateTriangleToggle(ZoneFrame)
+
+local zoneButtons = {
+    btnTP(ZoneFrame, "ZONE 1", 45, CFrame.new(135.748795, 3.49802542, 0.501021981)),
+    btnTP(ZoneFrame, "ZONE 2", 85, CFrame.new(1232.22766, 3.49802446, 4.46258783)),
+    btnTP(ZoneFrame, "ZONE 3", 125, CFrame.new(2540.60742, 3.49802542, -4.54981041)),
+    btnTP(ZoneFrame, "ZONE 4", 165, CFrame.new(3523.06494, 3.49802494, -3.34155941)),
+    btnTP(ZoneFrame, "ZONE 5", 205, CFrame.new(4505.09375, 3.49802494, 8.59873104)),
+    btnTP(ZoneFrame, "ZONE 6", 245, CFrame.new(5492.44482, 3.49802446, 9.93157196)),
+    btnTP(ZoneFrame, "ZONE 7", 285, CFrame.new(6476.26709, 3.49802399, -4.04784584))
+}
+
+Footer1 = Instance.new("TextLabel", ZoneFrame)
+Footer1.Size, Footer1.Position = UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 1, -30)
+Footer1.Text = "YouTube : SemWok"
+Footer1.TextColor3, Footer1.BackgroundTransparency, Footer1.Font, Footer1.TextSize = Color3.new(1, 1, 1), 1, "SourceSansBold", 20
+
+local zoneOpen = true
+ZoneTriangle.MouseButton1Click:Connect(function()
+    zoneOpen = not zoneOpen
+    if zoneOpen then
+        ZoneFrame:TweenSize(UDim2.new(0, 200, 0, 365), "Out", "Quad", 0.2, true)
+        ZoneTriangle.Rotation = 0
+        task.wait(0.1)
+        for _, btn in pairs(zoneButtons) do btn.Visible = true end
+        Footer1.Visible = true
+    else
+        for _, btn in pairs(zoneButtons) do btn.Visible = false end
+        Footer1.Visible = false
+        ZoneFrame:TweenSize(UDim2.new(0, 200, 0, 35), "Out", "Quad", 0.2, true)
+        ZoneTriangle.Rotation = -90
+    end
+end)
+
+-- ==========================================
+-- FRAME 2: FITURE (NOCLIP + MACHINE + PERMA SPEED)
+-- ==========================================
+local FitureFrame = CreateMainBox("FitureFrame", UDim2.new(0.05, 215, 0.3, 0), UDim2.new(0, 200, 0, 175), "FITURE", 20)
+local FitureTriangle = CreateTriangleToggle(FitureFrame)
+
+-- 1. NOCLIP TOGGLE BUTTON
+local noclipBtn = Instance.new("TextButton", FitureFrame)
+noclipBtn.Size = UDim2.new(0.92, 0, 0, 35)
+noclipBtn.Position = UDim2.new(0.04, 0, 0, 45)
+noclipBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red for OFF
+noclipBtn.Text = "NOCLIP: OFF"
+noclipBtn.TextColor3 = Color3.new(1, 1, 1)
+noclipBtn.Font = Enum.Font.SourceSansBold
+noclipBtn.TextSize = 14
+Instance.new("UICorner", noclipBtn).CornerRadius = UDim.new(0, 6)
+
+noclipBtn.MouseButton1Click:Connect(function()
+    local targetState = not _G.NoclipActive
+    ToggleNoclip(targetState)
+    
+    if _G.NoclipActive then
+        noclipBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green
+        noclipBtn.Text = "NOCLIP: ON"
+    else
+        noclipBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red
+        noclipBtn.Text = "NOCLIP: OFF"
+    end
+end)
+
+-- 2. GOTO MACHINE BUTTON (MANUAL TELEPORT)
+local machineCFrame = CFrame.new(3.46718121, -387.611847, -117.454964)
+local machineBtn = btnTP(FitureFrame, "GOTO MACHINE", 85, machineCFrame)
+
+-- 3. SPEED TOGGLE BUTTON (PERMA-LOCK VERSION)
+local speedBtn = Instance.new("TextButton", FitureFrame)
+speedBtn.Size = UDim2.new(0.92, 0, 0, 35)
+speedBtn.Position = UDim2.new(0.04, 0, 0, 125)
+speedBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red for OFF
+speedBtn.Text = "SPEED: OFF"
+speedBtn.TextColor3 = Color3.new(1, 1, 1)
+speedBtn.Font = Enum.Font.SourceSansBold
+speedBtn.TextSize = 14
+Instance.new("UICorner", speedBtn).CornerRadius = UDim.new(0, 6)
+
+speedBtn.MouseButton1Click:Connect(function()
+    local targetState = not _G.SpeedActive
+    ToggleSpeed(targetState)
+    
+    if _G.SpeedActive then
+        speedBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green for ON
+        speedBtn.Text = "SPEED: ON"
+    else
+        speedBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red for OFF
+        speedBtn.Text = "SPEED: OFF"
+    end
+end)
+
+-- Minimize/Collapse event handler for FITURE frame
+local fitureOpen = true
+FitureTriangle.MouseButton1Click:Connect(function()
+    fitureOpen = not fitureOpen
+    if fitureOpen then
+        FitureFrame:TweenSize(UDim2.new(0, 200, 0, 175), "Out", "Quad", 0.2, true)
+        FitureTriangle.Rotation = 0
+        task.wait(0.1)
+        noclipBtn.Visible = true
+        machineBtn.Visible = true
+        speedBtn.Visible = true
+    else
+        noclipBtn.Visible = false
+        machineBtn.Visible = false
+        speedBtn.Visible = false
+        FitureFrame:TweenSize(UDim2.new(0, 200, 0, 35), "Out", "Quad", 0.2, true)
+        FitureTriangle.Rotation = -90
+    end
+end)
