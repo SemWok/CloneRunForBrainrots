@@ -1,5 +1,5 @@
 -- ==========================================
--- SEMWOK HUB: FULL UNINTERRUPTED TOGGLES
+-- SEMWOK HUB: FULL UNINTERRUPTED TOGGLES (V42)
 -- ==========================================
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
@@ -13,8 +13,6 @@ end
 local SG = Instance.new("ScreenGui", game.CoreGui)
 SG.Name = "SemWok_TwoFrames_Hub"
 SG.ResetOnSpawn = false
-
-local Footer1 -- Global variable for footer visibility control
 
 -- ==========================================
 -- NOCLIP SYSTEM LOGIC
@@ -68,9 +66,7 @@ local SpeedConnection = nil
 
 local function ToggleSpeed(state)
     _G.SpeedActive = state
-    
     if _G.SpeedActive then
-        -- Menggunakan Heartbeat biar dikunci tiap frame, anti-reset pas ambil item/mati
         if SpeedConnection then SpeedConnection:Disconnect() end
         SpeedConnection = RunService.Heartbeat:Connect(function()
             pcall(function()
@@ -85,7 +81,6 @@ local function ToggleSpeed(state)
             SpeedConnection:Disconnect()
             SpeedConnection = nil
         end
-        -- Kembalikan ke speed normal bawaan game pas dimatikan
         pcall(function()
             local char = LP.Character
             if char and char:FindFirstChild("Humanoid") then
@@ -95,7 +90,6 @@ local function ToggleSpeed(state)
     end
 end
 
--- Memastikan speed langsung jalan lagi tanpa jeda pas respawn
 LP.CharacterAdded:Connect(function()
     if _G.SpeedActive then
         ToggleSpeed(true)
@@ -103,44 +97,109 @@ LP.CharacterAdded:Connect(function()
 end)
 
 -- ==========================================
--- GUI CREATOR BASE FUNCTIONS
+-- GUI CREATOR MASTER FUNCTION (AUTO CLOSED AT START)
 -- ==========================================
-local function CreateMainBox(name, pos, size, titleTxt, titleSize)
+local function CreateSmartFrame(name, pos, targetSize, titleTxt)
+    -- Frame utama otomatis berukuran tinggi 42 di awal (Tertutup)
     local f = Instance.new("Frame", SG)
-    f.Name, f.BackgroundColor3, f.Position, f.Size = name, Color3.fromRGB(15, 15, 15), pos, size
-    f.Active, f.Draggable = true, true
+    f.Name = name
+    f.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    f.BorderSizePixel = 2
+    f.BorderColor3 = Color3.fromRGB(60, 60, 60)
+    f.Position = pos
+    f.Size = UDim2.new(0, targetSize.X.Offset, 0, 42)
+    f.Active = true
+    f.Draggable = true
     f.ClipsDescendants = true
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
     
-    if titleTxt ~= "" then
-        local tl = Instance.new("TextLabel", f)
-        tl.Size, tl.Text, tl.TextColor3, tl.BackgroundTransparency, tl.Font, tl.TextSize = UDim2.new(1, 0, 0, 35), titleTxt, Color3.new(1,1,1), 1, "SourceSansBold", titleSize
-        tl.Position = UDim2.new(0, 0, 0, 0)
-        tl.TextXAlignment = Enum.TextXAlignment.Center
-    end
-    return f
+    -- Judul asli menu saat terbuka (Awalnya disembunyikan)
+    local tl = Instance.new("TextLabel", f)
+    tl.Size = UDim2.new(1, 0, 0, 42)
+    tl.RichText = true
+    tl.Text = "<b>" .. titleTxt:upper() .. "</b>"
+    tl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tl.Font = Enum.Font.SourceSansBold
+    tl.TextSize = 18
+    tl.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    tl.BorderSizePixel = 0
+    tl.Visible = false
+    
+    -- Tombol Segitiga Mini (Warna Hitam Pekat)
+    local tg = Instance.new("TextButton", f)
+    tg.Size = UDim2.new(0, 30, 0, 30)
+    tg.Position = UDim2.new(1, -35, 0, 6)
+    tg.Text = "▲"
+    tg.TextColor3 = Color3.new(0, 0, 0)
+    tg.BackgroundTransparency = 1
+    tg.Font = Enum.Font.SourceSansBold
+    tg.TextSize = 20
+    tg.ZIndex = 5
+    
+    -- Container isi konten (Awalnya disembunyikan)
+    local container = Instance.new("Frame", f)
+    container.Name = "C"
+    container.Size = UDim2.new(1, 0, 1, -77)
+    container.Position = UDim2.new(0, 0, 0, 42)
+    container.BackgroundTransparency = 1
+    container.Visible = false
+    
+    -- Watermark saat frame ditutup (Ukuran 22, Kapital, Center Tengah)
+    local wmClosed = Instance.new("TextLabel", f)
+    wmClosed.Size = UDim2.new(1, 0, 0, 42)
+    wmClosed.Position = UDim2.new(0, 0, 0, 0)
+    wmClosed.RichText = true
+    wmClosed.Text = "<b>YOUTUBE: SEMWOK</b>"
+    wmClosed.TextColor3 = Color3.fromRGB(255, 255, 255)
+    wmClosed.Font = Enum.Font.SourceSansBold
+    wmClosed.TextSize = 22
+    wmClosed.BackgroundTransparency = 1
+    wmClosed.ZIndex = 4
+    wmClosed.TextXAlignment = Enum.TextXAlignment.Center
+    wmClosed.Visible = true
+    
+    local pad = Instance.new("UIPadding", wmClosed)
+    pad.PaddingLeft = UDim.new(0, 35)
+    pad.PaddingRight = UDim.new(0, 35)
+    
+    -- Watermark bawah saat frame terbuka (Ukuran 24)
+    local wmOpen = Instance.new("TextLabel", f)
+    wmOpen.Name = "WM"
+    wmOpen.Size = UDim2.new(1, 0, 0, 35)
+    wmOpen.Position = UDim2.new(0, 0, 1, -35)
+    wmOpen.RichText = true
+    wmOpen.Text = "<b>YOUTUBE: SEMWOK</b>"
+    wmOpen.TextColor3 = Color3.fromRGB(255, 255, 255)
+    wmOpen.Font = Enum.Font.SourceSansBold
+    wmOpen.TextSize = 24
+    wmOpen.BackgroundColor3 = Color3.new(0, 0, 0)
+    wmOpen.BackgroundTransparency = 0.3
+    wmOpen.TextXAlignment = Enum.TextXAlignment.Center
+    wmOpen.Visible = false
+    
+    -- Handler Animasi Klik Buka/Tutup
+    tg.MouseButton1Click:Connect(function()
+        local isOpen = container.Visible
+        container.Visible = not isOpen
+        tl.Visible = not isOpen
+        wmOpen.Visible = not isOpen
+        wmClosed.Visible = isOpen
+        
+        tg.Text = not isOpen and "▼" or "▲"
+        f:TweenSize(not isOpen and targetSize or UDim2.new(0, targetSize.X.Offset, 0, 42), "Out", "Quad", 0.15, true)
+    end)
+    
+    return container
 end
 
-local function CreateTriangleToggle(parent)
-    local tBtn = Instance.new("ImageButton", parent)
-    tBtn.Size = UDim2.new(0, 20, 0, 20)
-    tBtn.Position = UDim2.new(1, -30, 0, 8)
-    tBtn.BackgroundTransparency = 1
-    tBtn.Image = "rbxassetid://6031097225" 
-    tBtn.ImageColor3 = Color3.fromRGB(15, 15, 15)
-    
-    local stroke = Instance.new("UIStroke", tBtn)
-    stroke.Color = Color3.fromRGB(40, 40, 40)
-    stroke.Thickness = 1
-    return tBtn
-end
-
+-- Fungsi pembuat tombol TP Zona / Machine biasa
 local function btnTP(parent, txt, y, posCFrame)
     local b = Instance.new("TextButton", parent)
-    b.Size, b.Position = UDim2.new(0.92, 0, 0, 35), UDim2.new(0.04, 0, 0, y)
+    b.Size, b.Position = UDim2.new(1, -20, 0, 40), UDim2.new(0, 10, 0, y)
     b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    b.Text, b.TextColor3, b.Font, b.TextSize = txt, Color3.new(1,1,1), "SourceSansBold", 14
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+    b.BorderSizePixel = 1
+    b.BorderColor3 = Color3.fromRGB(60, 60, 60)
+    b.Text, b.TextColor3, b.Font, b.TextSize = "<b>" .. txt .. "</b>", Color3.new(1, 1, 1), Enum.Font.SourceSansBold, 16
+    b.RichText = true
     
     b.MouseButton1Click:Connect(function()
         local char = LP.Character
@@ -151,118 +210,77 @@ local function btnTP(parent, txt, y, posCFrame)
     return b
 end
 
--- ==========================================
--- FRAME 1: CLONE RUN FOR BRAINROT
--- ==========================================
-local ZoneFrame = CreateMainBox("ZoneFrame", UDim2.new(0.05, 0, 0.3, 0), UDim2.new(0, 200, 0, 365), "CLONE RUN FOR BRAINROT", 20)
-local ZoneTriangle = CreateTriangleToggle(ZoneFrame)
 
-local zoneButtons = {
-    btnTP(ZoneFrame, "ZONE 1", 45, CFrame.new(135.748795, 3.49802542, 0.501021981)),
-    btnTP(ZoneFrame, "ZONE 2", 85, CFrame.new(1232.22766, 3.49802446, 4.46258783)),
-    btnTP(ZoneFrame, "ZONE 3", 125, CFrame.new(2540.60742, 3.49802542, -4.54981041)),
-    btnTP(ZoneFrame, "ZONE 4", 165, CFrame.new(3523.06494, 3.49802494, -3.34155941)),
-    btnTP(ZoneFrame, "ZONE 5", 205, CFrame.new(4505.09375, 3.49802494, 8.59873104)),
-    btnTP(ZoneFrame, "ZONE 6", 245, CFrame.new(5492.44482, 3.49802446, 9.93157196)),
-    btnTP(ZoneFrame, "ZONE 7", 285, CFrame.new(6476.26709, 3.49802399, -4.04784584))
+-- ==========================================
+-- [ RUN SUSUNAN UTAMA KEDUA FRAME ]
+-- ==========================================
+
+-- 1. FRAME: CLONE RUN FOR BRAINROT (Otomatis Tertutup)
+local ZoneContainer = CreateSmartFrame("ZoneFrame", UDim2.new(0.47, 0, 0.2, 0), UDim2.new(0, 220, 0, 400), "CLONE RUN FOR BRAINROT")
+
+-- Scrolling Frame untuk menampung Zone 1-7
+local Scroll = Instance.new("ScrollingFrame", ZoneContainer)
+Scroll.Size = UDim2.new(1, 0, 1, 0)
+Scroll.BackgroundTransparency = 1
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 340)
+Scroll.ScrollBarThickness = 3
+
+local zoneCoordinates = {
+    CFrame.new(135.748795, 3.49802542, 0.501021981),
+    CFrame.new(1232.22766, 3.49802446, 4.46258783),
+    CFrame.new(2540.60742, 3.49802542, -4.54981041),
+    CFrame.new(3523.06494, 3.49802494, -3.34155941),
+    CFrame.new(4505.09375, 3.49802494, 8.59873104),
+    CFrame.new(5492.44482, 3.49802446, 9.93157196),
+    CFrame.new(6476.26709, 3.49802399, -4.04784584)
 }
 
-Footer1 = Instance.new("TextLabel", ZoneFrame)
-Footer1.Size, Footer1.Position = UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 1, -30)
-Footer1.Text = "YouTube : SemWok"
-Footer1.TextColor3, Footer1.BackgroundTransparency, Footer1.Font, Footer1.TextSize = Color3.new(1, 1, 1), 1, "SourceSansBold", 20
+for i = 1, 7 do
+    btnTP(Scroll, "ZONE " .. i, (i - 1) * 45 + 5, zoneCoordinates[i])
+end
 
-local zoneOpen = true
-ZoneTriangle.MouseButton1Click:Connect(function()
-    zoneOpen = not zoneOpen
-    if zoneOpen then
-        ZoneFrame:TweenSize(UDim2.new(0, 200, 0, 365), "Out", "Quad", 0.2, true)
-        ZoneTriangle.Rotation = 0
-        task.wait(0.1)
-        for _, btn in pairs(zoneButtons) do btn.Visible = true end
-        Footer1.Visible = true
-    else
-        for _, btn in pairs(zoneButtons) do btn.Visible = false end
-        Footer1.Visible = false
-        ZoneFrame:TweenSize(UDim2.new(0, 200, 0, 35), "Out", "Quad", 0.2, true)
-        ZoneTriangle.Rotation = -90
-    end
-end)
 
--- ==========================================
--- FRAME 2: FITURE (NOCLIP + MACHINE + PERMA SPEED)
--- ==========================================
-local FitureFrame = CreateMainBox("FitureFrame", UDim2.new(0.05, 215, 0.3, 0), UDim2.new(0, 200, 0, 175), "FITURE", 20)
-local FitureTriangle = CreateTriangleToggle(FitureFrame)
+-- 2. FRAME: FITURE (Otomatis Tertutup)
+local FitureContainer = CreateSmartFrame("FitureFrame", UDim2.new(0.70, 0, 0.2, 0), UDim2.new(0, 220, 0, 250), "FITURE")
 
--- 1. NOCLIP TOGGLE BUTTON
-local noclipBtn = Instance.new("TextButton", FitureFrame)
-noclipBtn.Size = UDim2.new(0.92, 0, 0, 35)
-noclipBtn.Position = UDim2.new(0.04, 0, 0, 45)
-noclipBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red for OFF
-noclipBtn.Text = "NOCLIP: OFF"
+-- Button 1: NOCLIP TOGGLE (ON/OFF)
+local noclipBtn = Instance.new("TextButton", FitureContainer)
+noclipBtn.Size = UDim2.new(1, -20, 0, 40)
+noclipBtn.Position = UDim2.new(0, 10, 0, 10)
+noclipBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+noclipBtn.BorderSizePixel = 1
+noclipBtn.BorderColor3 = Color3.fromRGB(60, 60, 60)
+noclipBtn.Text = "<b>NOCLIP: OFF</b>"
 noclipBtn.TextColor3 = Color3.new(1, 1, 1)
 noclipBtn.Font = Enum.Font.SourceSansBold
-noclipBtn.TextSize = 14
-Instance.new("UICorner", noclipBtn).CornerRadius = UDim.new(0, 6)
+noclipBtn.TextSize = 16
+noclipBtn.RichText = true
 
 noclipBtn.MouseButton1Click:Connect(function()
     local targetState = not _G.NoclipActive
     ToggleNoclip(targetState)
-    
-    if _G.NoclipActive then
-        noclipBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green
-        noclipBtn.Text = "NOCLIP: ON"
-    else
-        noclipBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red
-        noclipBtn.Text = "NOCLIP: OFF"
-    end
+    noclipBtn.Text = _G.NoclipActive and "<b>NOCLIP: ON</b>" or "<b>NOCLIP: OFF</b>"
 end)
 
--- 2. GOTO MACHINE BUTTON (MANUAL TELEPORT)
+-- Button 2: GOTO MACHINE
 local machineCFrame = CFrame.new(3.46718121, -387.611847, -117.454964)
-local machineBtn = btnTP(FitureFrame, "GOTO MACHINE", 85, machineCFrame)
+btnTP(FitureContainer, "GOTO MACHINE", 60, machineCFrame)
 
--- 3. SPEED TOGGLE BUTTON (PERMA-LOCK VERSION)
-local speedBtn = Instance.new("TextButton", FitureFrame)
-speedBtn.Size = UDim2.new(0.92, 0, 0, 35)
-speedBtn.Position = UDim2.new(0.04, 0, 0, 125)
-speedBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red for OFF
-speedBtn.Text = "SPEED: OFF"
+-- Button 3: SPEED TOGGLE (ON/OFF)
+local speedBtn = Instance.new("TextButton", FitureContainer)
+speedBtn.Size = UDim2.new(1, -20, 0, 40)
+speedBtn.Position = UDim2.new(0, 10, 0, 110)
+speedBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+speedBtn.BorderSizePixel = 1
+speedBtn.BorderColor3 = Color3.fromRGB(60, 60, 60)
+speedBtn.Text = "<b>SPEED: OFF</b>"
 speedBtn.TextColor3 = Color3.new(1, 1, 1)
 speedBtn.Font = Enum.Font.SourceSansBold
-speedBtn.TextSize = 14
-Instance.new("UICorner", speedBtn).CornerRadius = UDim.new(0, 6)
+speedBtn.TextSize = 16
+speedBtn.RichText = true
 
 speedBtn.MouseButton1Click:Connect(function()
     local targetState = not _G.SpeedActive
     ToggleSpeed(targetState)
-    
-    if _G.SpeedActive then
-        speedBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0) -- Green for ON
-        speedBtn.Text = "SPEED: ON"
-    else
-        speedBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0) -- Red for OFF
-        speedBtn.Text = "SPEED: OFF"
-    end
-end)
-
--- Minimize/Collapse event handler for FITURE frame
-local fitureOpen = true
-FitureTriangle.MouseButton1Click:Connect(function()
-    fitureOpen = not fitureOpen
-    if fitureOpen then
-        FitureFrame:TweenSize(UDim2.new(0, 200, 0, 175), "Out", "Quad", 0.2, true)
-        FitureTriangle.Rotation = 0
-        task.wait(0.1)
-        noclipBtn.Visible = true
-        machineBtn.Visible = true
-        speedBtn.Visible = true
-    else
-        noclipBtn.Visible = false
-        machineBtn.Visible = false
-        speedBtn.Visible = false
-        FitureFrame:TweenSize(UDim2.new(0, 200, 0, 35), "Out", "Quad", 0.2, true)
-        FitureTriangle.Rotation = -90
-    end
+    speedBtn.Text = _G.SpeedActive and "<b>SPEED: ON</b>" or "<b>SPEED: OFF</b>"
 end)
